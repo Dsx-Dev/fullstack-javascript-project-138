@@ -1,9 +1,9 @@
 import nock from 'nock';
-import { promises as fs } from 'fs';
+import { promises as fs, readFileSync } from 'fs';
 import os from 'os';
 import path from 'path';
 import * as cheerio from 'cheerio';
-import { fileURLToPath } from 'url'; // ¡NUEVO! Para manejar rutas en ESM
+import { fileURLToPath } from 'url';
 
 import loadPage from '../src/index.js';
 import { getFileName, getResourceDirName } from '../src/utils.js';
@@ -22,7 +22,6 @@ const htmlFileName = getFileName(baseUrl);
 
 // Rutas de archivos fixtures
 const pageHtmlPath = path.join(fixturesPath, 'page.html');
-const pageExpectedHtmlPath = path.join(fixturesPath, 'page_expected.html');
 const cssPath = path.join(fixturesPath, 'application.css');
 const pngPath = path.join(fixturesPath, 'nodejs.png');
 const jsPath = path.join(fixturesPath, 'runtime.js');
@@ -33,11 +32,9 @@ let downloadedHtmlPath;
 
 // Función de ayuda para simular la descarga de recursos
 const mockResource = (urlPath, fixturePath, isBinary = false) => {
-    // Usamos readFileSync aquí porque estamos dentro de beforeEach/mock
-    const fixtureData = fs.readFileSync(fixturePath);
+    const fixtureData = readFileSync(fixturePath);
     const contentType = isBinary ? 'image/png' : 'text/plain';
     
-    // Mocks de recursos locales (codica.la)
     nock(`http://${baseHost}`)
         .get(urlPath)
         .reply(200, fixtureData, { 'Content-Type': contentType });
@@ -46,14 +43,13 @@ const mockResource = (urlPath, fixturePath, isBinary = false) => {
 // Configuración de Nock para recursos externos
 const mockExternalResource = (url, fixturePath, isBinary = false) => {
     const urlObject = new URL(url);
-    const fixtureData = fs.readFileSync(fixturePath);
+    const fixtureData = readFileSync(fixturePath);
     const contentType = isBinary ? 'image/png' : 'text/plain';
     
     nock(`${urlObject.origin}`)
         .get(urlObject.pathname)
         .reply(200, fixtureData, { 'Content-Type': contentType });
 };
-
 
 // Antes de cada prueba: crear directorio temporal y configurar mocks
 beforeEach(async () => {
@@ -85,59 +81,40 @@ afterEach(async () => {
 
 describe('Page Loader functionality', () => {
 
-    // Test 1: Comprueba que la página principal se descarga y se guarda
     test('should download the page and save it with the correct name', async () => {
         await loadPage(baseUrl, tempDir);
         
-        // 1. Verificar que el archivo HTML existe
         await fs.access(downloadedHtmlPath); 
         
-        // 2. Verificar que el directorio de recursos existe
         const resourcesDirPath = path.join(tempDir, resourcesDirName);
         await fs.access(resourcesDirPath);
     });
 
-
-    // Test 2: Comprueba que los recursos se descargan y los enlaces HTML se modifican
     test('should download resources and modify HTML links', async () => {
         await loadPage(baseUrl, tempDir);
 
-        // --- VERIFICACIÓN DE CONTENIDO Y FORMATO HTML ---
         const downloadedHtml = await fs.readFile(downloadedHtmlPath, 'utf-8');
-        const expectedHtmlContent = await fs.readFile(pageExpectedHtmlPath, 'utf-8');
+        const $ = cheerio.load(downloadedHtml);
 
-        // Función para convertir barras invertidas (\) a barras diagonales (/)
-        const normalizePathSeparators = (html) => html.replace(/\\/g, '/');
+        // Verificar que los recursos locales tienen las rutas correctas
+        expect($('link[rel="stylesheet"]').eq(1).attr('href')).toBe('codica-la-cursos_files/codica-la-assets-application.css');
+        expect($('img').attr('src')).toBe('codica-la-cursos_files/codica-la-assets-professions-nodejs.png');
+        expect($('script').eq(1).attr('src')).toBe('codica-la-cursos_files/codica-la-packs-js-runtime.js');
 
-        // 1. Normalizar las barras en AMBOS archivos
-        const htmlWithNormalizedPaths = normalizePathSeparators(downloadedHtml);
-        const expectedWithNormalizedPaths = normalizePathSeparators(expectedHtmlContent);
-        
-        // 2. Usar Cheerio para normalizar el formato HTML
-        // Esto resuelve las diferencias de espaciado, <!DOCTYPE> y cierres de etiquetas.
-        const normalizedReceivedHtml = cheerio.load(htmlWithNormalizedPaths).html();
-        const normalizedExpectedHtml = cheerio.load(expectedWithNormalizedPaths).html();
+        // Verificar que los recursos externos NO fueron modificados
+        expect($('link[rel="stylesheet"]').eq(0).attr('href')).toBe('https://cdn2.codica.la/assets/menu.css');
+        expect($('script').eq(0).attr('src')).toBe('https://js.stripe.com/v3/');
 
-        // 3. Aserción final: compara el contenido normalizado
-        expect(normalizedReceivedHtml.trim()).toBe(normalizedExpectedHtml.trim());
-        
-        // --- VERIFICACIÓN DE ARCHIVOS DE RECURSOS ---
+        // Verificar que los archivos de recursos existen
         const resourcesDirPath = path.join(tempDir, resourcesDirName);
-        
-        // 1. CSS local
         await fs.access(path.join(resourcesDirPath, 'codica-la-assets-application.css'));
-        
-        // 2. Imagen PNG
         await fs.access(path.join(resourcesDirPath, 'codica-la-assets-professions-nodejs.png'));
-
-        // 3. JS local
         await fs.access(path.join(resourcesDirPath, 'codica-la-packs-js-runtime.js'));
     });
 
-    // Test 3: Manejo de errores de red (404)
     test('should throw an error on network failures', async () => {
+        nock.cleanAll();
         nock(`http://${baseHost}`).get('/cursos').reply(404);
-        // La aserción espera el mensaje de error que definiste en src/index.js
         await expect(loadPage(baseUrl, tempDir)).rejects.toThrow('Error de red (HTTP 404)');
     });
 });

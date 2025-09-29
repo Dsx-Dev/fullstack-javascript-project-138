@@ -106,8 +106,8 @@ const loadPage = (url, outputDir) => {
     .catch((error) => {
         logError(`Error principal de la descarga: ${error.message}`);
         if (error.response) {
-            // Error HTTP (404, 500, etc) // Corregido
-            throw new Error(`Error de red (HTTP ${error.response.status}) al cargar '${url}'`);
+            // Error HTTP (404, 500, etc)
+            throw new Error(`Error de red (HTTP ${error.response.status})`);
         }
         if (error.code && ['EACCES', 'ENOENT'].includes(error.code)) {
             // Error de permisos o directorio
