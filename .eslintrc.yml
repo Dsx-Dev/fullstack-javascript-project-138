@@ -1,0 +1,14 @@
+# .eslintrc.yml
+env:
+  browser: true
+  es2021: true
+  node: true
+  jest: true # Agregamos jest para que no marque errores en los archivos de prueba
+extends:
+  - 'airbnb-base'
+parserOptions:
+  ecmaVersion: 12
+  sourceType: module
+rules:
+  no-console: 0 # Permite usar console.log, útil para la CLI y debug
+  import/extensions: 0 # Permite importar módulos con extensión .js

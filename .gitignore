@@ -1,0 +1,17 @@
+# .gitignore
+# Dependencias
+/node_modules
+/dist
+
+# Archivos de depuración y logs
+npm-debug.log*
+yarn-debug.log*
+.nyc_output/
+
+# Directorios de pruebas y temporales
+/coverage
+.jest-cache/
+/tmp*
+# El directorio temporal de Node.js que usas en los tests
+page-loader-* # Variables de entorno
+.env
