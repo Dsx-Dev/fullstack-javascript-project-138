@@ -4,8 +4,8 @@ import path from 'path';
 import { promises as fs } from 'fs';
 import Listr from 'listr';
 import { URL } from 'url';
-import { getFileName, getResourceDirName, getResourceFileName } from './utils.js'; 
-import { log, logError } from './debug.js'; 
+import { getFileName, getResourceDirName, getResourceFileName } from './utils.js';
+import { log, logError } from './debug.js';
 
 const mapping = {
   img: 'src',
@@ -17,13 +17,15 @@ const downloadResource = (url, outputDir, resourceName) => {
   const filePath = path.join(outputDir, resourceName);
   log(`Descargando recurso: ${url} a ${filePath}`);
 
+  // Determinar si es binario para usar la codificación adecuada
   const isBinary = ['.png', '.jpg', '.jpeg', '.gif', '.svg'].some(ext => resourceName.endsWith(ext));
-
+  
   return axios.get(url, { responseType: isBinary ? 'arraybuffer' : 'text' })
     .then((response) => fs.writeFile(filePath, response.data))
     .catch((error) => {
       const errorMessage = error.message || `Código: ${error.code}`;
       logError(`Error al descargar recurso ${url}: ${errorMessage}`);
+      // Relanzar un error más amigable para Listr
       throw new Error(`Error de red al descargar recurso '${url}': ${errorMessage}`);
     });
 };
@@ -59,19 +61,20 @@ const loadPage = (url, outputDir) => {
           try {
             const absoluteUrl = new URL(resourceUrlRaw, url);
             const isLocal = absoluteUrl.origin === urlObject.origin;
-
-            // --- FILTRO CRÍTICO ---
-            if (absoluteUrl.pathname === mainPathname) {
+            
+            // FILTRO CRÍTICO: Ignorar el enlace canónico o cualquier recurso que apunte a la página principal.
+            if (isLocal && absoluteUrl.pathname === mainPathname) {
                 log(`Ignorando enlace canónico o principal: ${resourceUrlRaw}`);
                 return;
             }
-            // --- FIN FILTRO CRÍTICO ---
-
+            
             if (isLocal) {
               const resourceName = getResourceFileName(absoluteUrl.toString(), url);
               const resourceFullUrl = absoluteUrl.toString();
-              const newLocalPath = path.join(resourcesDirName, resourceName);
-
+              
+              // Usamos path.join para crear la ruta, pero la normalizaremos a '/' para el HTML
+              const newLocalPath = path.join(resourcesDirName, resourceName).replace(/\\/g, '/');
+              
               $(element).attr(attr, newLocalPath);
 
               resourcesToDownload.push({ 
@@ -103,11 +106,14 @@ const loadPage = (url, outputDir) => {
     .catch((error) => {
         logError(`Error principal de la descarga: ${error.message}`);
         if (error.response) {
+            // Error HTTP (404, 500, etc) // Corregido
             throw new Error(`Error de red (HTTP ${error.response.status}) al cargar '${url}'`);
         }
         if (error.code && ['EACCES', 'ENOENT'].includes(error.code)) {
+            // Error de permisos o directorio
             throw new Error(`Error de sistema de archivos: ${error.message}. Verifica permisos o que el directorio exista.`);
         }
+        // Otros errores de red o DNS
         throw new Error(`Error de red: ${error.message}`);
     });
 };
