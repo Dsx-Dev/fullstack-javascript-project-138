@@ -13,30 +13,6 @@ const mapping = {
   script: 'src',
 };
 
-// Función mejorada para eliminar BOM
-const removeBOM = (data) => {
-  // Si es un Buffer, verificar los bytes del BOM
-  if (Buffer.isBuffer(data)) {
-    if (data.length >= 3 &&
-        data[0] === 0xEF &&
-        data[1] === 0xBB &&
-        data[2] === 0xBF) {
-      return data.slice(3);
-    }
-    return data;
-  }
-  
-  // Si es un string, verificar el carácter BOM (U+FEFF)
-  if (typeof data === 'string') {
-    if (data.charCodeAt(0) === 0xFEFF) {
-      return data.slice(1);
-    }
-    return data;
-  }
-  
-  return data;
-};
-
 const downloadResource = (url, outputDir, resourceName) => {
   const filePath = path.join(outputDir, resourceName);
   log(`Descargando recurso: ${url} a ${filePath}`);
@@ -44,19 +20,13 @@ const downloadResource = (url, outputDir, resourceName) => {
   // Determinar si es binario
   const isBinary = ['.png', '.jpg', '.jpeg', '.gif', '.svg'].some(ext => resourceName.endsWith(ext));
   
-  return axios.get(url, { responseType: 'arraybuffer' })
+  // Usar 'arraybuffer' solo para binarios, 'text' para texto
+  return axios.get(url, { 
+    responseType: isBinary ? 'arraybuffer' : 'text',
+    transformResponse: [(data) => data] // No transformar la respuesta
+  })
     .then((response) => {
-      let data = response.data;
-      
-      // Para archivos de texto, convertir a Buffer y eliminar BOM
-      if (!isBinary) {
-        let buffer = Buffer.from(data);
-        buffer = removeBOM(buffer);
-        return fs.writeFile(filePath, buffer);
-      }
-      
-      // Para archivos binarios, escribir directamente
-      return fs.writeFile(filePath, data);
+      return fs.writeFile(filePath, response.data);
     })
     .catch((error) => {
       const errorMessage = error.message || `Código: ${error.code}`;
