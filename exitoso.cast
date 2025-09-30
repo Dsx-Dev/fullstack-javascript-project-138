@@ -1,0 +1,7 @@
+{"version": 2, "width": 120, "height": 30, "timestamp": 1759181829, "env": {"SHELL": "/bin/bash", "TERM": "xterm-256color"}}
+[0.061164, "o", "\u001b[?2004h\u001b]0;sofia@Sofii: /mnt/c/Users/sofia/Documents/GitHub/fullstack-javascript-project-138\u0007\u001b[01;32msofia@Sofii\u001b[00m:\u001b[01;34m/mnt/c/Users/sofia/Documents/GitHub/fullstack-javascript-project-138\u001b[00m$ "]
+[10.535382, "o", "\u001b[7mpage-loader --output /tmp https://codi\u001b[27m\u001b[7mc\u001b[27m\u001b[7ma.la/cursos\u001b[27m"]
+[12.191688, "o", "\u001b[A\r\u001b]0;sofia@Sofii: /mnt/c/Users/sofia/Documents/GitHub/fullstack-javascript-project-138\u0007\u001b[01;32msofia@Sofii\u001b[00m:\u001b[01;34m/mnt/c/Users/sofia/Documents/GitHub/fullstack-javascript-project-138\u001b[00m$ page-loader --output /tmp https://codica.la/cursos\r\n\u001b[?2004l\r"]
+[12.320463, "o", "/mnt/c/Users/sofia/AppData/Roaming/npm/page-loader: 15: exec: node: not found\r\n"]
+[12.322609, "o", "\u001b[?2004h\u001b]0;sofia@Sofii: /mnt/c/Users/sofia/Documents/GitHub/fullstack-javascript-project-138\u0007\u001b[01;32msofia@Sofii\u001b[00m:\u001b[01;34m/mnt/c/Users/sofia/Documents/GitHub/fullstack-javascript-project-138\u001b[00m$ "]
+[19.485789, "o", "\u001b[?2004l\r\r\nexit\r\n"]

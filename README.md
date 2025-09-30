@@ -31,7 +31,7 @@ Página descargada exitosamente en: /var/tmp/codica-la-cursos.html
 (Aquí debes incrustar las animaciones de Asciinema que muestren el uso exitoso, el manejo de errores y el registro de logs, como se requiere en las tareas).
 
 Ejemplo de Uso Exitoso
-[Asciinema: Ejemplo de uso exitoso]
+[Asciinema: asciicast saved to demo-exitoso.cast]
 
 Ejemplo con Manejo de Errores
 [Asciinema: Ejemplo de manejo de errores HTTP/FS]
