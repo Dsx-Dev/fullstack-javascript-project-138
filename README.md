@@ -1,40 +1,53 @@
-### Hexlet tests and linter status:
-[![Actions Status](https://github.com/Dsx-Dev/fullstack-javascript-project-138/actions/workflows/hexlet-check.yml/badge.svg)](https://github.com/Dsx-Dev/fullstack-javascript-project-138/actions)
 
-# 📦 Page Loader Utility (`@hexlet/code`)
+📦 Utilidad de carga de páginas (@hexlet/code)
+Una utilidad de línea de comandos para descargar páginas web y sus recursos locales (imágenes, scripts, estilos) en un directorio específico. El programa modifica los enlaces de los recursos en el HTML descargado para que apunten a los archivos locales.
 
-Una utilidad de línea de comandos para descargar páginas web y sus recursos locales (imágenes, scripts, estilos) en un directorio específico.
+🚀 Instalación y Uso
+Este paquete está diseñado para ser instalado localmente como una herramienta de desarrollo y ser ejecutado desde la raíz del proyecto.
 
-## 🚀 Instalación
+Instalación Local
+Para usar el comando page-loader directamente desde el directorio raíz del proyecto (donde se encuentra package.json), usa npm link:
 
-Este paquete está diseñado para ser instalado localmente como una herramienta de desarrollo.
+Bash
 
-```bash
-# Para usar el comando page-loader desde el directorio raíz del proyecto:
 npm link
-🛠️ Uso
-Descarga Básica
+Uso Básico
 Descarga una página web y sus recursos al directorio de trabajo actual.
 
 Bash
 
-page-loader [https://codica.la/cursos](https://codica.la/cursos)
+page-loader https://codica.la/cursos
 Página descargada exitosamente en: /home/user/current-dir/codica-la-cursos.html
 Descarga a un Directorio Específico
 Usa la opción -o o --output para especificar el directorio de destino.
 
 Bash
 
-page-loader --output /var/tmp [https://codica.la/cursos](https://codica.la/cursos)
+page-loader --output /var/tmp https://codica.la/cursos
 Página descargada exitosamente en: /var/tmp/codica-la-cursos.html
-🎬 Ejemplos de Funcionamiento (Asciinema)
-(Aquí debes incrustar las animaciones de Asciinema que muestren el uso exitoso, el manejo de errores y el registro de logs, como se requiere en las tareas).
+---
+## 🎬 Ejemplos de Funcionamiento (Asciinema)
 
-Ejemplo de Uso Exitoso
-[Asciinema: asciicast saved to demo-exitoso.cast]
+### 1. Ejemplo de Instalación y Uso Exitoso
+Esta grabación muestra el proceso de enlazar el paquete con `npm link` y ejecutar una descarga exitosa del sitio, guardando el HTML y sus recursos.
 
-Ejemplo con Manejo de Errores
-[Asciinema: Ejemplo de manejo de errores HTTP/FS]
+[![asciicast: Ejemplo de uso exitoso](https://asciinema.org/a/sIcmx02YY3FGYeLGfmz0Ak2qr.svg)](https://asciinema.org/a/sIcmx02YY3FGYeLGfmz0Ak2qr)
 
-Ejemplo con Debugging Habilitado
-[Asciinema: Ejemplo con DEBUG=page-loader]
+---
+
+### 2. Ejemplo con Manejo de Errores
+Esta grabación demuestra cómo el programa maneja los errores, como un fallo de conexión o un código de estado HTTP no exitoso (ej. 404 Not Found).
+
+[![asciicast: Ejemplo de manejo de errores HTTP/FS](https://asciinema.org/a/VVQopqjpT8Zc79axqov2OcqcB.svg)](https://asciinema.org/a/VVQopqjpT8Zc79axqov2OcqcB)
+
+---
+
+### 3. Ejemplo con Debugging Habilitado
+Esta grabación muestra el log de depuración detallado cuando se utiliza la variable de entorno `DEBUG=page-loader`.
+
+*Nota: Tu enlace para el debug parece ser un enlace de conexión directa y no un enlace de reproducción (`/a/`). He asumido que necesitas el código de incrustación. Si el enlace de arriba falla, verifica si el enlace de reproducción es diferente.*
+
+[![asciicast: Ejemplo con DEBUG=page-loader](https://asciinema.org/connect/26de17d3-eeb1-477a-9c2f-96780b133696.svg)](https://asciinema.org/connect/26de17d3-eeb1-477a-9c2f-96780b133696)
+
+⚙️ Desarrollo
+(Aquí puedes añadir comandos como make install, make test, y la estructura de directorios si es relevante para otros desarrolladores).
