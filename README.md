@@ -85,7 +85,8 @@ make test
 # Revisar formato y lint
 make lint
 ```
-
+### Hexlet tests and linter status:
+[![Actions Status](https://github.com/Dsx-Dev/fullstack-javascript-project-138/actions/workflows/hexlet-check.yml/badge.svg)](https://github.com/Dsx-Dev/fullstack-javascript-project-138/actions)
 
 ---
 
