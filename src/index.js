@@ -64,7 +64,10 @@ const loadPage = (url, outputDir) => {
             
             if (isLocal) {
               // FILTRO CRÍTICO: Ignorar el enlace canónico o cualquier recurso que apunte a la página principal.
-              if (absoluteUrl.pathname === mainPathname) {
+              // Normalizamos ambos pathnames para ignorar la barra final (trailing slash)
+              const resourcePathname = absoluteUrl.pathname.replace(/\/$/, '');
+              const mainPagePathname = mainPathname.replace(/\/$/, '');
+              if (resourcePathname === mainPagePathname) {
                   log(`Ignorando enlace canónico o principal: ${resourceUrlRaw}`);
                   return;
               }
