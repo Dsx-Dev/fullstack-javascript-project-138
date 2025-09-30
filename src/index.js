@@ -62,13 +62,13 @@ const loadPage = (url, outputDir) => {
             const absoluteUrl = new URL(resourceUrlRaw, url);
             const isLocal = absoluteUrl.origin === urlObject.origin;
             
-            // FILTRO CRÍTICO: Ignorar el enlace canónico o cualquier recurso que apunte a la página principal.
-            if (isLocal && absoluteUrl.pathname === mainPathname) {
-                log(`Ignorando enlace canónico o principal: ${resourceUrlRaw}`);
-                return;
-            }
-            
             if (isLocal) {
+              // FILTRO CRÍTICO: Ignorar el enlace canónico o cualquier recurso que apunte a la página principal.
+              if (absoluteUrl.pathname === mainPathname) {
+                  log(`Ignorando enlace canónico o principal: ${resourceUrlRaw}`);
+                  return;
+              }
+
               const resourceName = getResourceFileName(absoluteUrl.toString(), url);
               const resourceFullUrl = absoluteUrl.toString();
               
