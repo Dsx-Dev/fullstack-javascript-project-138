@@ -17,13 +17,8 @@ const downloadResource = (url, outputDir, resourceName) => {
   const filePath = path.join(outputDir, resourceName);
   log(`Descargando recurso: ${url} a ${filePath}`);
 
-  // Determinar si es binario
-  const isBinary = ['.png', '.jpg', '.jpeg', '.gif', '.svg'].some(ext => resourceName.endsWith(ext));
-  
-  // Usar 'arraybuffer' solo para binarios, 'text' para texto
   return axios.get(url, { 
-    responseType: isBinary ? 'arraybuffer' : 'text',
-    transformResponse: [(data) => data] // No transformar la respuesta
+    responseType: 'arraybuffer', // Siempre descargar como buffer para evitar problemas de codificación
   })
     .then((response) => {
       return fs.writeFile(filePath, response.data);
