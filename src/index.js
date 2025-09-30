@@ -13,6 +13,18 @@ const mapping = {
   script: 'src',
 };
 
+// NUEVA FUNCIÓN: Elimina el BOM (Byte Order Mark) si existe
+const removeBOM = (buffer) => {
+  // El BOM UTF-8 es: EF BB BF (239 187 191)
+  if (buffer.length >= 3 &&
+      buffer[0] === 0xEF &&
+      buffer[1] === 0xBB &&
+      buffer[2] === 0xBF) {
+    return buffer.slice(3);
+  }
+  return buffer;
+};
+
 const downloadResource = (url, outputDir, resourceName) => {
   const filePath = path.join(outputDir, resourceName);
   log(`Descargando recurso: ${url} a ${filePath}`);
@@ -20,8 +32,18 @@ const downloadResource = (url, outputDir, resourceName) => {
   // Determinar si es binario para usar la codificación adecuada
   const isBinary = ['.png', '.jpg', '.jpeg', '.gif', '.svg'].some(ext => resourceName.endsWith(ext));
   
-  return axios.get(url, { responseType: isBinary ? 'arraybuffer' : 'text' })
-    .then((response) => fs.writeFile(filePath, response.data))
+  // CAMBIO IMPORTANTE: Siempre usar 'arraybuffer' para tener control total del buffer
+  return axios.get(url, { responseType: 'arraybuffer' })
+    .then((response) => {
+      let buffer = Buffer.from(response.data);
+      
+      // NUEVO: Eliminar BOM solo de archivos de texto (CSS, JS, HTML)
+      if (!isBinary) {
+        buffer = removeBOM(buffer);
+      }
+      
+      return fs.writeFile(filePath, buffer);
+    })
     .catch((error) => {
       const errorMessage = error.message || `Código: ${error.code}`;
       logError(`Error al descargar recurso ${url}: ${errorMessage}`);
