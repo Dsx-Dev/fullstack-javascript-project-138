@@ -66,7 +66,7 @@ Página descargada exitosamente en: /var/tmp/codica-la-cursos.html
 
 
 * **Ejemplo con Debugging Habilitado**
- [![asciicast: Ejemplo con DEBUG=page-loader](https://asciinema.org/connect/26de17d3-eeb1-477a-9c2f-96780b133696.svg)](https://asciinema.org/connect/26de17d3-eeb1-477a-9c2f-96780b133696)
+[![asciicast](https://asciinema.org/a/KgntfA30o6f9vp23e5jOoyWOQ.svg)](https://asciinema.org/a/KgntfA30o6f9vp23e5jOoyWOQ)
 > ⚠️ Nota: Asegúrate de que el enlace usado sea el de **reproducción (/a/)** y no un enlace de conexión directa.
 
 ---
