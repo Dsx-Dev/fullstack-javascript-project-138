@@ -13,41 +13,54 @@ const mapping = {
   script: 'src',
 };
 
-// NUEVA FUNCIÓN: Elimina el BOM (Byte Order Mark) si existe
-const removeBOM = (buffer) => {
-  // El BOM UTF-8 es: EF BB BF (239 187 191)
-  if (buffer.length >= 3 &&
-      buffer[0] === 0xEF &&
-      buffer[1] === 0xBB &&
-      buffer[2] === 0xBF) {
-    return buffer.slice(3);
+// Función mejorada para eliminar BOM
+const removeBOM = (data) => {
+  // Si es un Buffer, verificar los bytes del BOM
+  if (Buffer.isBuffer(data)) {
+    if (data.length >= 3 &&
+        data[0] === 0xEF &&
+        data[1] === 0xBB &&
+        data[2] === 0xBF) {
+      return data.slice(3);
+    }
+    return data;
   }
-  return buffer;
+  
+  // Si es un string, verificar el carácter BOM (U+FEFF)
+  if (typeof data === 'string') {
+    if (data.charCodeAt(0) === 0xFEFF) {
+      return data.slice(1);
+    }
+    return data;
+  }
+  
+  return data;
 };
 
 const downloadResource = (url, outputDir, resourceName) => {
   const filePath = path.join(outputDir, resourceName);
   log(`Descargando recurso: ${url} a ${filePath}`);
 
-  // Determinar si es binario para usar la codificación adecuada
+  // Determinar si es binario
   const isBinary = ['.png', '.jpg', '.jpeg', '.gif', '.svg'].some(ext => resourceName.endsWith(ext));
   
-  // CAMBIO IMPORTANTE: Siempre usar 'arraybuffer' para tener control total del buffer
   return axios.get(url, { responseType: 'arraybuffer' })
     .then((response) => {
-      let buffer = Buffer.from(response.data);
+      let data = response.data;
       
-      // NUEVO: Eliminar BOM solo de archivos de texto (CSS, JS, HTML)
+      // Para archivos de texto, convertir a Buffer y eliminar BOM
       if (!isBinary) {
+        let buffer = Buffer.from(data);
         buffer = removeBOM(buffer);
+        return fs.writeFile(filePath, buffer);
       }
       
-      return fs.writeFile(filePath, buffer);
+      // Para archivos binarios, escribir directamente
+      return fs.writeFile(filePath, data);
     })
     .catch((error) => {
       const errorMessage = error.message || `Código: ${error.code}`;
       logError(`Error al descargar recurso ${url}: ${errorMessage}`);
-      // Relanzar un error más amigable para Listr
       throw new Error(`Error de red al descargar recurso '${url}': ${errorMessage}`);
     });
 };
